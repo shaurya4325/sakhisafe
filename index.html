@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sakhi Safe — the guardian that never waits for a phone</title>
+<meta name="description" content="Sakhi Safe is a pocket safety device: hold SOS for three seconds or shout, and it alerts her circle, talks her through it, and walks her to the nearest police station. Team Sanketra 2, Bharat Innovation Challenge 2.0.">
+<meta name="theme-color" content="#FFF7FA">
+<link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="fonts/AnekDevanagari.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="css/site.css">
+<script type="importmap">{ "imports": { "three": "./vendor/three/three.module.min.js", "three/addons/": "./vendor/three/addons/" } }</script>
+</head>
+<body>
+
+<!-- loader -->
+<div id="loader" aria-hidden="true">
+  <div class="ld-in">
+    <div class="ld-top mono"><span>SAKHI SAFE · POCKET GUARDIAN</span><span id="ldPct">000</span></div>
+    <div class="ld-word">Arming<em>&nbsp;your sakhi</em></div>
+    <div class="ld-bar"><i></i></div>
+    <div class="ld-log mono" id="ldLog">BLE · LOOKING FOR HER PHONE</div>
+  </div>
+  <svg class="ld-rings" viewBox="0 0 120 60"><circle cx="42" cy="30" r="22"/><circle cx="78" cy="30" r="22"/></svg>
+</div>
+
+<canvas id="world" aria-hidden="true"></canvas>
+<img id="still" src="img/device-still.webp" alt="" aria-hidden="true">
+<div id="labels" aria-hidden="true"></div>
+<div class="grain" aria-hidden="true"></div>
+
+<!-- status bar HUD: the device's own status, live with the story -->
+<div id="hud" aria-hidden="true">
+  <i class="vf tl"></i><i class="vf tr"></i><i class="vf bl"></i><i class="vf br"></i>
+  <div class="hud-l mono"><span class="st" id="hudSos"><i></i><b>SOS READY</b></span><span>31.2533° N · 75.7033° E</span><span>LPU · PHAGWARA · PB</span></div>
+  <div class="hud-r mono"><span id="hudCh">00 / START</span><span class="bat"><i id="hudBat"></i></span></div>
+  <div class="hud-rail"><i id="hudBar"></i></div>
+</div>
+
+<header class="nav">
+  <a class="brand" href="#top" data-magnet><svg viewBox="0 0 40 24" aria-hidden="true"><circle cx="14" cy="12" r="8.5"/><circle cx="26" cy="12" r="8.5"/></svg>SAKHI SAFE<span class="hi">सखी</span></a>
+  <nav class="links mono">
+    <a href="#sos">SOS</a><a href="#shout">Shout</a><a href="#stun">Stun</a><a href="#route">Route</a><a href="#mirror">Mirror</a><a href="#inside">Inside</a><a href="#app">App</a>
+  </nav>
+  <a class="pill" href="#team" data-magnet><span class="rec"></span>Team Sanketra 2</a>
+</header>
+
+<main id="top">
+
+<!-- 00 HERO -->
+<section class="ch hero" data-ch="hero" data-name="START" data-bg="#FFF7FA" data-fg="#2B1A22">
+  <p class="tagline"><span class="tl1">Break the pattern <em>today.</em></span><span class="tl2">Or the loop will repeat tomorrow.</span></p>
+  <div class="hero-word" aria-label="Sakhi Safe"><span class="hw hw1">SAKHI</span><span class="hw hw2">SAFE</span></div>
+  <div class="hero-meta">
+    <p class="eyebrow mono">Social Impact · Women’s Safety · Bharat Innovation Challenge 2.0</p>
+    <p class="hero-hi">सखी — हर पल साथ</p>
+  </div>
+  <div class="hero-foot">
+    <p class="lead" data-split>A pocket guardian. It hears a scream, raises the alarm, and walks her to the police. Even when her phone is gone.</p>
+    <div class="badge"><span class="star">✦</span><span><b>Grand Finale</b><br>LPU, Punjab · 20–21 Nov 2026</span></div>
+  </div>
+  <div class="cue mono"><span>Scroll · stay close</span><i></i></div>
+</section>
+
+<!-- 01 PROBLEM -->
+<section class="ch pin problem" data-ch="problem" data-name="PROBLEM" data-bg="#1A0F15" data-fg="#FFF0F5" style="--len:340vh">
+  <div class="stick">
+    <p class="kicker mono">The problem · one bad night</p>
+    <div class="kin">
+      <span class="k k1">Phone snatched.</span>
+      <span class="k k2">No signal.</span>
+      <span class="k k3">No time to unlock.</span>
+    </div>
+    <div class="kin-after">
+      <p class="big">Every app assumes she can reach her phone.<br><span class="dim">The worst moments are the ones she can’t.</span></p>
+      <div class="stat"><span class="n" data-to="71">0</span><span class="u">s</span><p>In India, a crime against a woman is recorded about every 71 seconds. <span class="src mono">4,41,534 in a year · NCRB</span></p></div>
+    </div>
+  </div>
+</section>
+
+<!-- 02 SOS -->
+<section class="ch pin sos" id="sos" data-ch="sos" data-name="SOS" data-bg="#FFF7FA" data-fg="#2B1A22" style="--len:420vh">
+  <div class="stick">
+    <div class="sos-head">
+      <p class="kicker mono">SOS · one button</p>
+      <h2 class="h2" data-split>Hold for three seconds.<br>That is the whole plan.</h2>
+    </div>
+    <div class="timer mono"><span id="tHold">0.0</span><small>s</small><em id="tState">HOLD</em></div>
+    <ol class="flow">
+      <li><span class="mono">01</span><b>Siren</b> and a voice: “Pull up the taser!”</li>
+      <li><span class="mono">02</span><b>Her circle</b> gets SMS + WhatsApp</li>
+      <li><span class="mono">03</span><b>Live location</b> every two minutes</li>
+      <li><span class="mono">04</span><b>Nearby phones</b> pass it on, no internet</li>
+    </ol>
+  </div>
+</section>
+
+<!-- 03 SHOUT -->
+<section class="ch pin shout" id="shout" data-ch="shout" data-name="SHOUT" data-bg="#FCE8EF" data-fg="#2B1A22" style="--len:380vh">
+  <div class="stick">
+    <p class="kicker mono">Shout trigger · no hands needed</p>
+    <h2 class="cry"><span class="dv">सखी बचाओ!</span><span class="en">Sakhi Bachao!</span></h2>
+    <div class="meter" aria-hidden="true">
+      <div class="bars" id="bars"></div>
+      <div class="thr"><span class="mono">TRIGGER · 3× THE ROOM</span></div>
+    </div>
+    <div class="read mono"><span>LEVEL <b id="lvl">0.0×</b></span><span>HELD <b id="held">0.0 s</b> / 0.7 s</span><span class="fire" id="shoutGo">→ SOS</span></div>
+    <p class="note">It listens for a long, loud shout, not a clap or a door. Ignores its own siren.</p>
+  </div>
+</section>
+
+<!-- 04 VOICE -->
+<section class="ch pin voice" id="voice" data-ch="voice" data-name="VOICE" data-bg="#C2185B" data-fg="#FFF7FA" style="--len:380vh">
+  <div class="stick">
+    <p class="kicker mono">Voice · English + हिंदी</p>
+    <h2 class="h2 voice-h">It doesn’t beep at her.<br><span>It tells her what to do.</span></h2>
+    <div class="say">
+      <div class="tabs mono"><span class="on">SOS</span><span>Route</span><span>Mirror</span></div>
+      <div class="lines">
+        <div class="line on"><p class="dvq">टेज़र निकालो!</p><p class="gl">Pull up the taser!</p></div>
+        <div class="line"><p class="dvq">पचास मीटर बाद, दाएँ मुड़ें।</p><p class="gl">In fifty metres, turn right.</p></div>
+        <div class="line"><p class="dvq">आईना सामान्य लग रहा है।</p><p class="gl">This mirror looks normal.</p></div>
+      </div>
+      <div class="wave" aria-hidden="true"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 05 STUN -->
+<section class="ch pin stun" id="stun" data-ch="stun" data-name="STUN" data-bg="#12090E" data-fg="#FFF0F5" style="--len:360vh">
+  <div class="stick">
+    <p class="kicker mono">Stun · the last resort</p>
+    <h2 class="h2" data-split>Last resort.<br>Locked until she means it.</h2>
+    <div class="lock">
+      <div class="sw" id="sw" aria-hidden="true"><i></i><span class="mono off">OFF</span><span class="mono on">ON</span></div>
+      <ul class="mono">
+        <li id="lk1"><b>POWER OFF</b> → the stun button is dead</li>
+        <li id="lk2"><b>POWER ON + HOLD</b> → the relay closes</li>
+        <li id="lk3"><b>NO CODE</b> can ever fire it</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- 06 ROUTE -->
+<section class="ch pin route" id="route" data-ch="route" data-name="ROUTE" data-bg="#FFF7FA" data-fg="#2B1A22" style="--len:440vh">
+  <div class="stick">
+    <div class="route-copy">
+      <p class="kicker mono">Escape route · on the device</p>
+      <h2 class="h2" data-split>SOS goes out.<br>It walks her to the police.</h2>
+    </div>
+    <div class="nav-card mono" id="navCard">
+      <div class="nc-row"><span>TO</span><b>Chaheru Police Post</b></div>
+      <div class="nc-turn"><i class="arrow"></i><b id="ncDist">120 m</b><span id="ncDir">AHEAD</span></div>
+      <div class="nc-bar"><i id="ncBar"></i></div>
+      <p class="nc-say" id="ncSay">“Route started. Follow the purple line.”</p>
+    </div>
+    <ol class="ladder mono" id="ladder">
+      <li><b>1</b>Google Maps<em>nearest police, live</em></li>
+      <li><b>2</b>OpenStreetMap<em>if Google is down</em></li>
+      <li><b>3</b>Saved on the device<em>last good list</em></li>
+      <li><b>4</b>Built in<em>never empty</em></li>
+    </ol>
+  </div>
+</section>
+
+<!-- 07 MIRROR -->
+<section class="ch pin mirror" id="mirror" data-ch="mirror" data-name="MIRROR" data-bg="#1A0F15" data-fg="#FFF0F5" style="--len:340vh">
+  <div class="stick">
+    <div class="mir-copy">
+      <p class="kicker mono">Mirror check · four IR eyes</p>
+      <h2 class="h2" data-split>Trial room. Hotel. Is that mirror watching her?</h2>
+    </div>
+    <div class="mcard mono" id="mcard">
+      <div class="mrow"><span>IR 1 · 2 · 3 · 4</span><b id="mvals">— — — —</b></div>
+      <div class="mbars"><i></i><i></i><i></i><i></i></div>
+      <div class="mres" id="mres">SCANNING</div>
+    </div>
+    <p class="mnote mono">A two-way mirror sends back less light. A hint, not proof. It learns your mirrors.</p>
+  </div>
+</section>
+
+<!-- 08 DURESS -->
+<section class="ch pin duress" id="duress" data-ch="duress" data-name="DURESS" data-bg="#FFF7FA" data-fg="#2B1A22" style="--len:320vh">
+  <div class="stick">
+    <p class="kicker mono">Duress cancel · OK + PREV</p>
+    <h2 class="h2 du-h">Forced to cancel?<br><span>It pretends.</span></h2>
+    <div class="twin">
+      <div class="tw a"><p class="mono">What he sees</p><b>SOS cancelled.</b><span>Green light. Quiet screen.</span></div>
+      <div class="tw b"><p class="mono">What really happens</p><b>Silent alert.</b><span>“Cancelled under duress. Do not call her.” Location keeps going.</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- 09 INSIDE -->
+<section class="ch pin inside" id="inside" data-ch="inside" data-name="INSIDE" data-bg="#F6ECF0" data-fg="#2B1A22" style="--len:460vh">
+  <div class="stick">
+    <p class="kicker mono">Teardown · every module is real</p>
+    <h2 class="h2 in-h" data-split>Everything inside it.</h2>
+    <p class="in-sub">Off-the-shelf parts. Two small brains. One job.</p>
+  </div>
+</section>
+
+<!-- 10 BRAINS -->
+<section class="ch brain" data-ch="brain" data-name="BRAINS" data-bg="#1A0F15" data-fg="#FFF0F5">
+  <p class="kicker mono">Core · two boards, one link</p>
+  <h2 class="h2 wide" data-split>Two brains. If one fails, the SOS still works.</h2>
+  <div class="duo">
+    <article class="b1"><span class="no mono">ESP32 · LISTENS + SPEAKS</span><p>SOS button, shout mic, mirror eyes, siren, Bluetooth to her phone and to the speaker.</p></article>
+    <div class="link mono"><i></i><span>UART · 115200</span></div>
+    <article class="b2"><span class="no mono">NODEMCU · SEES + FINDS</span><p>Screen, PREV · OK · NEXT, Wi-Fi, maps, nearest police, its own WhatsApp.</p></article>
+  </div>
+  <div class="alarm">
+    <p class="mono">Every alert falls down a ladder. Help arrives on every rung.</p>
+    <ol class="mono">
+      <li><b>0</b>Siren on the device<em>never fails</em></li>
+      <li><b>1</b>Her phone · SMS + WhatsApp<em>with live location</em></li>
+      <li><b>2</b>Nearby Sakhi Safe phones<em>Bluetooth, no internet</em></li>
+      <li><b>3</b>The device’s own WhatsApp<em>over Wi-Fi, no phone</em></li>
+    </ol>
+  </div>
+</section>
+
+<!-- 11 APP -->
+<section class="ch pin app" id="app" data-ch="app" data-name="APP" data-bg="#2B1A22" data-fg="#FFF0F5" style="--len:520vh">
+  <div class="stick">
+    <div class="app-copy">
+      <p class="kicker mono">Companion · Android app</p>
+      <h2 class="h2 app-h"><span class="ah on">One tap away. All of it.</span><span class="ah">When she can’t, they can.</span><span class="ah">Before anything happens.</span></h2>
+    </div>
+    <div class="stage" id="appStage">
+      <svg class="leads" id="leads"></svg>
+      <figure class="ph c" data-step="0"><img src="img/app/home.webp" alt="Sakhi Safe app home screen" loading="lazy"></figure>
+      <figure class="ph l" data-step="1"><img src="img/app/mesh.webp" alt="Someone near you needs help" loading="lazy"></figure>
+      <figure class="ph r" data-step="1"><img src="img/app/count.webp" alt="Sending SOS countdown" loading="lazy"></figure>
+      <figure class="ph l2" data-step="2"><img src="img/app/walk.webp" alt="Safe Walk" loading="lazy"></figure>
+      <figure class="ph r2" data-step="2"><img src="img/app/help.webp" alt="Help nearby" loading="lazy"></figure>
+      <div class="tags" id="tags"></div>
+    </div>
+  </div>
+</section>
+
+<!-- 12 REAL -->
+<section class="ch real" data-ch="real" data-name="REAL" data-bg="#1A0F15" data-fg="#FFF0F5">
+  <div class="real-head">
+    <p class="kicker mono">Photographs · not a render</p>
+    <h2 class="h2">Everything above was drawn by your browser.<br><span class="dim">This is the bench it came from.</span></h2>
+  </div>
+  <div class="shots">
+    <figure><img src="img/real/bench.webp" alt="Every module laid out on the pink base" loading="lazy"><figcaption class="mono"><b>01</b>Every module, laid out</figcaption></figure>
+    <figure><img src="img/real/tft-test.webp" alt="The screen on its first test" loading="lazy"><figcaption class="mono"><b>02</b>The screen, first light</figcaption></figure>
+  </div>
+</section>
+
+<!-- 13 TEAM -->
+<section class="ch team" id="team" data-ch="team" data-name="TEAM" data-bg="#FFF7FA" data-fg="#2B1A22">
+  <p class="kicker mono">Team Sanketra 2</p>
+  <div class="people">
+    <div class="pp"><img src="img/team/shaurya.webp" alt="Shaurya Kothari" loading="lazy"><h3>Shaurya Kothari</h3></div>
+    <div class="pp"><img src="img/team/kartikey.webp" alt="Kartikey Purohit" loading="lazy"><h3>Kartikey Purohit</h3></div>
+    <div class="pp"><img src="img/team/reyansh.webp" alt="Reyansh Baunthiyal" loading="lazy"><h3>Reyansh Baunthiyal</h3></div>
+  </div>
+  <p class="school">DAV Public School, Dehradun</p>
+</section>
+
+<!-- 14 TAGLINE -->
+<footer class="ch foot" data-ch="foot" data-name="END" data-bg="#FFF7FA" data-fg="#2B1A22">
+  <p class="t1">Break the pattern <span class="today">today.</span></p>
+  <svg class="loop" viewBox="0 0 1000 80" preserveAspectRatio="none" aria-hidden="true"><path id="loopPath" d=""/><path id="freePath" d=""/></svg>
+  <p class="t2">Or the loop will repeat <span>tomorrow.</span></p>
+  <div class="foot-row mono">
+    <span>सखी — हर पल साथ</span>
+    <span>Theme · Social Impact · Women’s Safety</span>
+    <span>Bharat Innovation Challenge 2.0 · LPU</span>
+    <span>Team Sanketra 2 · 2026</span>
+  </div>
+  <div class="get" id="get">
+    <a class="qr" href="https://github.com/shaurya4325/sakhisafe/releases/latest/download/SakhiSafe.apk" data-magnet aria-label="Download the Sakhi Safe Android app">
+      <img src="img/app-qr.svg" alt="QR code: download the Sakhi Safe app" width="200" height="200">
+    </a>
+    <div class="get-tx">
+      <p class="kicker mono">Get the app · Android</p>
+      <p class="get-h">Scan to download <b>Sakhi Safe</b>.</p>
+      <p class="get-p">The companion app that pairs with the Sakhi Safe device over Bluetooth: SOS, her circle, nearby help, Safe Walk, fake call.</p>
+      <a class="pill dl" href="https://github.com/shaurya4325/sakhisafe/releases/latest/download/SakhiSafe.apk" data-magnet><span class="rec"></span>Download APK · 64 MB</a>
+      <p class="get-n mono">Android may ask to allow “install unknown apps” for your browser.</p>
+    </div>
+  </div>
+</footer>
+
+</main>
+
+<div id="cursor" aria-hidden="true"><i></i></div>
+<noscript><style>#loader{display:none}</style></noscript>
+<script type="module" src="js/main.js"></script>
+</body>
+</html>
